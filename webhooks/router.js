@@ -5,7 +5,7 @@ const OperatorController = require('./operator/controller');
 
 const router = express.Router();
 
-router.post('/webhooks/voice', (req, res) => {
+router.post('/voice', (req, res) => {
     const { From } = ctx.body;
     const response = new VoiceResponse();
     response.say("You Matter! And we're here to make sure you know so.", { voice: "female" });
@@ -32,14 +32,14 @@ router.post('/webhooks/voice', (req, res) => {
 
 });
 
-router.post('/webhooks/voice/queue', (req, res) => {
+router.post('/queue', (req, res) => {
     const response = new VoiceResponse();
     response.say("Please wait while we connect you...");
 
     res.send(response.toString());
 });
 
-router.post('/webhooks/voice/end', (req, res) => {
+router.post('/voice/end', (req, res) => {
     const { DialSid } = res.status;
 
     OperatorController.get_dail_to(DialSid, function(call) {

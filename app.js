@@ -4,6 +4,8 @@ require('./db');
 const express = require('express');
 const { urlencoded } = require('body-parser');
 
+const WebhooksRouter = require('./webhooks/router');
+
 const app = express();
 
 app.use(urlencoded({ extended: true }));
