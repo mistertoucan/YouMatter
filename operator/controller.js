@@ -1,4 +1,5 @@
 const Operator = require('./model');
+const twilio = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
 const lib = {};
 
@@ -18,13 +19,27 @@ lib.create_operator = function(phone_number, name, cb) {
     Operator.create({ phone_number, name }, cb);
 }
 
-lib.mark_operator_unavailable = function(operator_id) {
-    Operator.updateOne({ _id: operator_id, in_call: false });
+lib.mark_operator_unavailable = function(phone_number) {
+    Operator.updateOne({ phone_number: phone_number, in_call: false });
 }
 
-lib.mark_operator_available = function(operator_id) {
-    Operator.updateOne({ _id: operator_id, in_call: true });
+lib.mark_operator_available = function(phone_number) {
+    Operator.updateOne({ phone_number: phone_number, in_call: true });
 }
+
+lib.send_sms = function(operator, phone_number) {
+    twilio.messages.create({
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: operator.phone_number,
+        body: `YouMatter: ${phone_number} is calling you for help. Could you take a few minutes to make them feel better?`
+    });
+};
+
+lib.get_dail_to = function(dial_sid, cb) {
+    twilio.calls(dial_sid).fetch().then(cb);
+};
+
+// Tests
 
 lib.create_test_data = function() {
     lib.get_operator("2019235253", (err, exists) => {
@@ -37,5 +52,7 @@ lib.create_test_data = function() {
         });
     });
 }
+
+lib.create_test_data();
 
 module.exports = lib;
