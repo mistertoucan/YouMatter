@@ -16,6 +16,8 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use('/webhooks', WebhooksRouter);
+
 app.post("*", (req, res) => {
     console.log("REQUEST RECEIVED");
     console.log(req, res);
