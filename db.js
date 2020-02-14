@@ -9,4 +9,6 @@ mongoose.connect(process.env.MONGODB_CONNECTION_URI, {useNewUrlParser: true})
     console.log('> Error: Could not connect to MongoDB Database!');
     console.log('> Exiting...');
     process.exit(1);
-})
+});
+
+require('./operator/model');

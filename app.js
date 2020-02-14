@@ -12,6 +12,11 @@ const app = express();
 app.use(urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
+app.use((req, res, next) => {
+    res.type = 'text/xml';
+    next();
+});
+
 app.post('/webhooks/voice', (req, res) => {
     const response = new VoiceResponse();
     response.say("You Matter, and we're here to make sure you know so.", { voice: "female" });
@@ -21,15 +26,17 @@ app.post('/webhooks/voice', (req, res) => {
             console.log(``> Info: Dialing `${operator.phone_number}`);
             response.dial(operator.phone_number, { action: '/end' });
 
-            res.json(response.toString());
+            res.send(response.toString());
 
             OperatorController.mark_operator_unavailable(phone_number);
         } else {
             console.log('> Info: Can\'t connect find available operator @ webhooks/voice', err);
             const dial = response.dial(operator.phone_number);
-            response.queue({
+            dial.queue({
                 url: './queue'
             });
+
+            res.send()
         }
     });
 
@@ -44,6 +51,8 @@ app.post('/webhooks/voice/queue', (req, res) => {
 
 app.post('/webhooks/voice/end', (req, res) => {
     const { To } = req.body;
+
+    OperatorController.mark_operator_available(To);
 });
 
 const port = process.env.PORT || 3000;
